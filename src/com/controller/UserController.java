@@ -15,6 +15,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.beans.UserBean;
+import com.models.Menu;
 import com.models.User;
 
 @Path("/")
@@ -44,20 +45,27 @@ public class UserController {
 		return json.toJSONString();
 	}
 
-	@GET
-	@Path("/signup/{userName}/{email}/{phone}/{password}")
+	@POST
+	@Path("/signup")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String signup(@PathParam("userName") String userName,
-			@PathParam("email") String email, @PathParam("phone") String phone,
-			@PathParam("password") String pass) throws SQLException {
+	public String signup(@FormParam("userName") String userName,
+			@FormParam("email") String email, @FormParam("phone") String phone,
+			@FormParam("pass") String pass) throws SQLException {
 
 		UserBean userbean = new UserBean();
-		int user = userbean.addUser(userName, email, phone, pass);
+		User user = userbean.addUser(userName, email, phone, pass);
 
 		JSONObject json = new JSONObject();
-
-		json.put("status", "true");
-		json.put("nRows", user);
+		if (user == null)
+			json.put("status", "false");
+		else {
+			json.put("status", "true");
+			json.put("userID", user.getUserID());
+			json.put("userName", user.getUserName());
+			json.put("email", user.getEmail());
+			json.put("pass", user.getPassword());
+			json.put("phone", user.getPhone());
+		}
 
 		return json.toJSONString();
 	}
@@ -67,9 +75,10 @@ public class UserController {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String viewFavOrders(@PathParam("customeId") int customerId)
 			throws SQLException {
-		ArrayList<String> favOrders = new ArrayList<String>();	
+		ArrayList<String> favOrders = new ArrayList<String>();
 
-		RestaurantController restaurantController  = RestaurantController.getInstance();
+		RestaurantController restaurantController = RestaurantController
+				.getInstance();
 		favOrders = restaurantController.sendCustomerId(customerId);
 		JSONArray jsonArray = new JSONArray();
 
@@ -86,9 +95,13 @@ public class UserController {
 	@Path("/ProcessQRCode/{restID}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String ProcessQRCode(@PathParam("restID") int restID) {
+
 		RestaurantController restController = RestaurantController
 				.getInstance();
-		return restController.buildRestaurantJSON(restID);
+
+		Menu menu = restController.getRestaurantMenu(restID);
+
+		return restController.convertMenuToJSON(menu);
 	}
 
 	@GET

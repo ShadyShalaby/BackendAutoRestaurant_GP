@@ -30,7 +30,6 @@ public class RestaurantController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	public static RestaurantController getInstance() {
@@ -51,6 +50,40 @@ public class RestaurantController {
 			restaurants.add(restaurant);
 		}
 
+	}
+
+	public Menu getRestaurantMenu(int restID) {
+
+		Menu retMenu = null;
+		for (Restaurant restaurant : restaurants) {
+			Menu menu = restaurant.getMenu();
+			if (menu.getMenuId() == restID) {
+				retMenu = menu;
+				break;
+			}
+		}
+
+		return retMenu;
+	}
+
+	public String convertMenuToJSON(Menu menu) {
+		JSONObject json = new JSONObject();
+
+		json.put("status", "true");
+		String items = "";
+
+		for (Category cat : menu.getCategories()) {
+			for (Item item : cat.getItems()) {
+				items += item.getItemID() + ",," + item.getItemName() + ",,"
+						+ item.getDescription() + ",," + item.getPrice() + ",,"
+						+ item.getLikes() + ",," + item.getDislikes() + ",,"
+						+ item.getItemPic() + "##";
+			}
+
+			json.put(cat.getCategoryID(), cat.getCategoryName() + "||" + items);
+		}
+
+		return json.toJSONString();
 	}
 
 	public String buildMenuJSON(int restID) {
@@ -100,13 +133,12 @@ public class RestaurantController {
 
 		return json.toJSONString();
 	}
-	
-	public ArrayList<String> sendCustomerId(int customerId) throws SQLException
-	{
+
+	public ArrayList<String> sendCustomerId(int customerId) throws SQLException {
 		OrderBean orderBean = new OrderBean();
 		ArrayList<String> favOrders = new ArrayList<String>();
-		favOrders= orderBean.getFavOrders(customerId);
-		
+		favOrders = orderBean.getFavOrders(customerId);
+
 		return favOrders;
 	}
 

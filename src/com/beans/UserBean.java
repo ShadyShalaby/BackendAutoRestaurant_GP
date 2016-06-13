@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.models.User;
+import com.mysql.jdbc.Statement;
 
 public class UserBean {
 
@@ -30,7 +31,7 @@ public class UserBean {
 			user = new User();
 
 			user.setUserName(rs.getString("userName"));
-			user.setUserName(rs.getString("customerId"));
+			user.setUserID(rs.getInt("customerId"));
 			user.setEmail(rs.getString("email"));
 			user.setPassword(rs.getString("customerPassword"));
 			user.setPhone(rs.getString("phone"));
@@ -42,29 +43,37 @@ public class UserBean {
 		return user;
 	}
 
-	public int addUser(String userName, String email, String phone, String pass)
-			throws SQLException {
+	public User addUser(String userName, String email, String phone, String pass){
+
 		String sql = "Insert into Customer"
-				+ " (userName,email,phone ,customerPassword)"
-				+ " VALUES  (?,?,?,?)";
+				+ " (userName, email, phone, customerPassword)" 
+				+ " VALUES ('"
+				+ userName + "','" + email + "','" + phone + "','" + pass
+				+ "')";
 
-		PreparedStatement stmt;
-		stmt = conn.prepareStatement(sql);
-		stmt.setString(1, userName);
-		stmt.setString(2, email);
-		stmt.setString(3, phone);
-		stmt.setString(4, pass);
+		User user = null;
+		int id = 0;
+		try {
+			Statement stmt = (Statement) conn.createStatement();
+			int nRows = stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 
-		int nRows = stmt.executeUpdate();
-		
-		if(nRows == 1){
-			
-		} else {
-			
+			ResultSet rs = stmt.getGeneratedKeys();
+			if(rs.next()){
+				id = rs.getInt(1);
+			}
+			if (nRows == 1) {
+				user = new User();
+
+				user.setUserName(userName);
+				user.setUserID(id);
+				user.setEmail(email);
+				user.setPassword(pass);
+				user.setPhone(phone);
+			} 
+		} catch (SQLException e) {
 		}
-			
-		
-		return nRows;
+
+		return user;
 	}
 
 }
