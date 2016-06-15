@@ -3,6 +3,7 @@ package com.controller;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.beans.OrderBean;
@@ -11,6 +12,7 @@ import com.models.Branch;
 import com.models.Category;
 import com.models.Item;
 import com.models.Menu;
+import com.models.MenuBuilder;
 import com.models.Restaurant;
 import com.models.ResturantBuilder;
 import com.models.Review;
@@ -49,7 +51,6 @@ public class RestaurantController {
 			Restaurant restaurant = restBuilder.buildRestaurant(menuID);
 			restaurants.add(restaurant);
 		}
-
 	}
 
 	public Menu getRestaurantMenu(int restID) {
@@ -67,23 +68,34 @@ public class RestaurantController {
 	}
 
 	public String convertMenuToJSON(Menu menu) {
-		JSONObject json = new JSONObject();
 
-		json.put("status", "true");
+		JSONArray jsonArray = new JSONArray();
+		JSONObject jsonStatus = new JSONObject();
+
+		if (menu == null) {
+			jsonStatus.put("status", "false");
+			jsonArray.add(jsonStatus);
+			return jsonArray.toJSONString();
+		}
+
+		jsonStatus.put("status", "true");
 		String items = "";
 
 		for (Category cat : menu.getCategories()) {
+			JSONObject json = new JSONObject();
+
 			for (Item item : cat.getItems()) {
 				items += item.getItemID() + ",," + item.getItemName() + ",,"
-						+ item.getDescription() + ",," + item.getPrice() + ",,"
+					    + item.getDescription() + ",," + item.getPrice() + ",,"
 						+ item.getLikes() + ",," + item.getDislikes() + ",,"
 						+ item.getItemPic() + "##";
 			}
 
 			json.put(cat.getCategoryID(), cat.getCategoryName() + "||" + items);
+			jsonArray.add(json);
 		}
 
-		return json.toJSONString();
+		return jsonArray.toJSONString();
 	}
 
 	public String buildMenuJSON(int restID) {
@@ -141,5 +153,38 @@ public class RestaurantController {
 
 		return favOrders;
 	}
+
+	/************************** By Sheref Shokry **************************/
+
+	public ArrayList<Restaurant> searchRestaurantByName(String restaurantName)
+			throws SQLException {
+
+		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
+
+		for (Restaurant rest : restaurants) {
+			if (rest.getRestName().contains(restaurantName))
+				restaurantList.add(rest);
+		}
+
+		return restaurantList;
+	}
+
+	public ArrayList<Menu> searchMenuByCategory(String category)
+			throws SQLException {
+
+		ArrayList<Menu> menuList = new ArrayList<Menu>();
+
+		for (Restaurant rest : restaurants) {
+			MenuBuilder menu = new MenuBuilder();
+			for (Category cat : rest.getMenu().getCategories()) {
+				if (cat.getCategoryName().contains(category))
+					menuList.add(menu.buildMenu(rest.getRestaurantID()));
+			}
+		}
+
+		return menuList;
+	}
+
+	/**********************************************************************/
 
 }
