@@ -79,9 +79,9 @@ public class RestaurantController {
 		}
 
 		jsonStatus.put("status", "true");
-		String items = "";
 
 		for (Category cat : menu.getCategories()) {
+			String items = "";
 			JSONObject json = new JSONObject();
 
 			for (Item item : cat.getItems()) {

@@ -19,12 +19,12 @@ public class ItemBean {
 	public ArrayList<Item> getCategoryItems(int categoryId) throws SQLException {
 
 		String sql = "Select * from Item where `categoryId` = ? ";
+		ArrayList<Item> items = new ArrayList<Item>();
 
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, categoryId);
 		ResultSet rs = stmt.executeQuery();
-		ArrayList<Item> items = new ArrayList<Item>();
 
 		while (rs.next()) {
 

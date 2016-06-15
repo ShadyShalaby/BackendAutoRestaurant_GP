@@ -94,10 +94,10 @@ public class UserController {
 		return jsonArray.toJSONString();
 	}
 
-	@GET
-	@Path("/ProcessQRCode/{restID}")
+	@POST
+	@Path("/ProcessQRCode")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String ProcessQRCode(@PathParam("restID") int restID) {
+	public String ProcessQRCode(@FormParam("restID") int restID) {
 
 		RestaurantController restController = RestaurantController
 				.getInstance();
@@ -202,29 +202,6 @@ public class UserController {
 
 	/**********************************************************************/
 	
-	@GET
-	@Path("/testCatItems/{catID}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getCatItems(@PathParam("catID") int category) {
-		ItemBean itemBean = new ItemBean();
-		String str = "";
-		try {
-			ArrayList<Item>items = itemBean.getCategoryItems(category);
-			for(Item item : items){
-				str += item.getItemID() + ",," + item.getItemName() + ",,"
-					    + item.getDescription() + ",," + item.getPrice() + ",,"
-						+ item.getLikes() + ",," + item.getDislikes() + ",,"
-						+ item.getItemPic() + "##";				
-			}
-		} catch (SQLException e) {
-			str += e.toString();
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return str;
-	}
-
 	@GET
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)
