@@ -121,7 +121,7 @@ public class UserController {
 		JSONObject json = new JSONObject();
 
 		json.put("status", "true");
-		json.put("#ofLikes", likes);
+		json.put("nLikes", likes);
 
 		return json.toJSONString();
 	}
@@ -139,7 +139,7 @@ public class UserController {
 		JSONObject json = new JSONObject();
 
 		json.put("status", "true");
-		json.put("#ofdisLikes", disLikes);
+		json.put("nDislikes", disLikes);
 
 		return json.toJSONString();
 	}
@@ -148,8 +148,7 @@ public class UserController {
 	@Path("/searchByName")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String searchByName(
-			@FormParam("restaurantName") String restaurantName)
-			throws SQLException {
+			@FormParam("restaurantName") String restaurantName) {
 		RestaurantController restController = RestaurantController
 				.getInstance();
 
@@ -158,18 +157,9 @@ public class UserController {
 
 		JSONArray jsArray = new JSONArray();
 
-		for (int i = 0; i < restaurantList.size(); i++) {
-			JSONObject jsObj = new JSONObject();
-
-			jsObj.put("RestaurantID", restaurantList.get(i).getRestaurantID());
-			jsObj.put("RestaurantName", restaurantList.get(i).getRestName());
-			jsObj.put("RestaurantLogo", restaurantList.get(i).getLogo());
-			jsObj.put("RestaurantRating", restaurantList.get(i).getRating());
-			jsObj.put("RestaurantHotline", restaurantList.get(i).getHotLine());
-			jsObj.put("RestaurantType", restaurantList.get(i).getType()
-					.toString());
-			jsObj.put("RestaurantWorkingHours", restaurantList.get(i)
-					.getWorkingHours());
+		for (Restaurant restaurant : restaurantList) {
+			JSONObject jsObj = restController
+					.convertRestaurantToJSON(restaurant);
 
 			jsArray.add(jsObj);
 		}
@@ -180,20 +170,19 @@ public class UserController {
 	@POST
 	@Path("/searchByCategory")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String searchByCategory(@FormParam("category") String category)
-			throws SQLException {
+	public String searchByCategory(@FormParam("category") String category) {
 		RestaurantController restController = RestaurantController
 				.getInstance();
 
-		ArrayList<Menu> menuList = new ArrayList<Menu>();
-		menuList = restController.searchMenuByCategory(category);
+		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
+		restaurantList = restController.searchRestaurantByCategory(category);
 
 		JSONArray jsArray = new JSONArray();
 
-		for (int i = 0; i < menuList.size(); i++) {
+		for (Restaurant restaurant : restaurantList) {
+			JSONObject jsObj = restController
+					.convertRestaurantToJSON(restaurant);
 
-			JSONObject jsObj = new JSONObject();
-			jsObj.put("MenuID", menuList.get(i).getMenuId());
 			jsArray.add(jsObj);
 		}
 
@@ -201,7 +190,7 @@ public class UserController {
 	}
 
 	/**********************************************************************/
-	
+
 	@GET
 	@Path("/")
 	@Produces(MediaType.TEXT_PLAIN)

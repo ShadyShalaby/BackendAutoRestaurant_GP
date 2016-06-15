@@ -86,7 +86,7 @@ public class RestaurantController {
 
 			for (Item item : cat.getItems()) {
 				items += item.getItemID() + ",," + item.getItemName() + ",,"
-					    + item.getDescription() + ",," + item.getPrice() + ",,"
+						+ item.getDescription() + ",," + item.getPrice() + ",,"
 						+ item.getLikes() + ",," + item.getDislikes() + ",,"
 						+ item.getItemPic() + "##";
 			}
@@ -96,6 +96,70 @@ public class RestaurantController {
 		}
 
 		return jsonArray.toJSONString();
+	}
+
+	/************************** By Sheref Shokry **************************/
+
+	public ArrayList<Restaurant> searchRestaurantByName(String restaurantName) {
+
+		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
+
+		for (Restaurant rest : restaurants) {
+			if (rest.getRestName().contains(restaurantName))
+				restaurantList.add(rest);
+		}
+
+		return restaurantList;
+	}
+
+	public ArrayList<Restaurant> searchRestaurantByCategory(String category) {
+
+		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
+
+		for (Restaurant rest : restaurants) {
+
+			for (String type : rest.getType()) {
+				if (type.contains(category)) {
+					restaurantList.add(rest);
+					break;
+				}
+			}
+		}
+		/*
+		 * ArrayList<Menu> menuList = new ArrayList<Menu>(); MenuBuilder menu =
+		 * new MenuBuilder();
+		 * 
+		 * for (Category cat : rest.getMenu().getCategories()) { if
+		 * (cat.getCategoryName().contains(category))
+		 * menuList.add(menu.buildMenu(rest.getRestaurantID())); } return
+		 * menuList;
+		 */
+
+		return restaurantList;
+	}
+
+	public JSONObject convertRestaurantToJSON(Restaurant restaurant) {
+		JSONObject jsObj = new JSONObject();
+
+		jsObj.put("RestID", restaurant.getRestaurantID());
+		jsObj.put("RestName", restaurant.getRestName());
+		jsObj.put("RestLogo", restaurant.getLogo());
+		jsObj.put("RestRating", restaurant.getRating());
+		jsObj.put("RestHotline", restaurant.getHotLine());
+		jsObj.put("RestType", String.join(",", restaurant.getType().toString()));
+		jsObj.put("RestWHours", restaurant.getWorkingHours());
+
+		return jsObj;
+	}
+
+	/**********************************************************************/
+
+	public ArrayList<String> sendCustomerId(int customerId) throws SQLException {
+		OrderBean orderBean = new OrderBean();
+		ArrayList<String> favOrders = new ArrayList<String>();
+		favOrders = orderBean.getFavOrders(customerId);
+
+		return favOrders;
 	}
 
 	public String buildMenuJSON(int restID) {
@@ -145,46 +209,5 @@ public class RestaurantController {
 
 		return json.toJSONString();
 	}
-
-	public ArrayList<String> sendCustomerId(int customerId) throws SQLException {
-		OrderBean orderBean = new OrderBean();
-		ArrayList<String> favOrders = new ArrayList<String>();
-		favOrders = orderBean.getFavOrders(customerId);
-
-		return favOrders;
-	}
-
-	/************************** By Sheref Shokry **************************/
-
-	public ArrayList<Restaurant> searchRestaurantByName(String restaurantName)
-			throws SQLException {
-
-		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
-
-		for (Restaurant rest : restaurants) {
-			if (rest.getRestName().contains(restaurantName))
-				restaurantList.add(rest);
-		}
-
-		return restaurantList;
-	}
-
-	public ArrayList<Menu> searchMenuByCategory(String category)
-			throws SQLException {
-
-		ArrayList<Menu> menuList = new ArrayList<Menu>();
-
-		for (Restaurant rest : restaurants) {
-			MenuBuilder menu = new MenuBuilder();
-			for (Category cat : rest.getMenu().getCategories()) {
-				if (cat.getCategoryName().contains(category))
-					menuList.add(menu.buildMenu(rest.getRestaurantID()));
-			}
-		}
-
-		return menuList;
-	}
-
-	/**********************************************************************/
 
 }

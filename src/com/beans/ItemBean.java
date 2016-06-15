@@ -53,7 +53,7 @@ public class ItemBean {
 	public int likeItem(int itemId, int userId, int restaurantId)
 			throws SQLException {
 
-		String sql = "Select * from Item where `itemId` =? ";
+		String sql = "Select * from Item where `itemId` = ?";
 
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
@@ -123,7 +123,6 @@ public class ItemBean {
 		}
 
 		return likes;
-
 	}
 
 	public int disLikeItem(int itemId, int userId, int restaurantId)
