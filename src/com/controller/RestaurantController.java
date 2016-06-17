@@ -105,8 +105,6 @@ public class RestaurantController {
 		return json.toJSONString();
 	}
 
-	/************************** By Sheref Shokry **************************/
-
 	public ArrayList<Restaurant> searchRestaurantByName(String restaurantName) {
 
 		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
@@ -160,8 +158,6 @@ public class RestaurantController {
 		return jsObj;
 	}
 
-	/**********************************************************************/
-
 	public int createOrder(boolean isFavOrder, double subTotal, double tax,
 			double services, double total, Timestamp orderTime,
 			int tableNumber, int restaurantId, int cornerId, int customerId,
@@ -185,13 +181,27 @@ public class RestaurantController {
 		return orderID;
 	}
 
-	public ArrayList<String> sendCustomerId(int customerId) throws SQLException {
+	/**************************************************************************/
+
+	public ArrayList<Order> findFavOrders(int customerId) throws SQLException {
+		
 		OrderBean orderBean = new OrderBean();
-		ArrayList<String> favOrders = new ArrayList<String>();
+		ArrayList<Order> favOrders = new ArrayList<Order>();
 		favOrders = orderBean.getFavOrders(customerId);
 
 		return favOrders;
 	}
+
+	public ArrayList<Order> findPrevOrders(int customerId) throws SQLException {
+
+		OrderBean orderBean = new OrderBean();
+		ArrayList<Order> prevOrders = new ArrayList<Order>();
+		prevOrders = orderBean.getPrevOrders(customerId);
+
+		return prevOrders;
+	}
+
+	/**************************************************************************/
 
 	public String buildMenuJSON(int restID) {
 		JSONObject json = new JSONObject();

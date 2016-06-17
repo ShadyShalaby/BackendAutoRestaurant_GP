@@ -6,8 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.models.Item;
 import com.models.Order;
-import com.models.User;
+import com.models.Reciept;
 
 public class OrderBean {
 
@@ -17,29 +18,86 @@ public class OrderBean {
 		conn = DBConnection.getActiveConnection();
 	}
 
-	public ArrayList<String> getFavOrders(int customerId) throws SQLException {
-		String sql = "SELECT itemName, itemDescription, itemPrice, orderId "
-				+ "FROM Item, OrderItem WHERE Item.itemId = OrderItem.itemId"
-				+ "	AND orderId IN "
-				+ "(SELECT orderId FROM Orders WHERE 'customerId' =? AND isFavOrder =1)";
+	public ArrayList<Item> getItemsOfOrder(int orderId) throws SQLException {
+		String sql = "SELECT * FROM Item, OrderItem"
+				+ " WHERE Item.itemId = OrderItem.itemId"
+				+ " AND OrderItem.orderId =?";
+
+		PreparedStatement stmt;
+		stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, orderId);
+		ResultSet rs = stmt.executeQuery();
+
+		ArrayList<Item> items = new ArrayList<Item>();
+
+		while (rs.next()) {
+			Item item = new Item();
+			item.setItemName(rs.getString("itemName"));
+			item.setDescription(rs.getString("itemDescription"));
+			item.setPrice(rs.getDouble("itemPrice"));
+			item.setQuantity(rs.getInt("quantity"));
+
+			items.add(item);
+		}
+		return items;
+	}
+
+	public ArrayList<Order> getFavOrders(int customerId) throws SQLException {
+		String sql = "SELECT orderId" + " FROM Orders, Customer"
+				+ " WHERE Orders.customerId = Customer.customerId"
+				+ " AND Orders.isFavOrder = 1" + " AND Orders.customerId = ?";
 
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
 		stmt.setInt(1, customerId);
 		ResultSet rs = stmt.executeQuery();
-		ArrayList<String> favOrders = new ArrayList<String>();
+		ArrayList<Order> favOrders = new ArrayList<Order>();
 
-		String order = "";
 		while (rs.next()) {
-			order += (rs.getString("itemName") + ","
-					+ rs.getString("itemDescription") + "," + rs
-					.getString("itemPrice"));
+
+			Order order = new Order();
+			ArrayList<Item> items = new ArrayList<Item>();
+
+			order.setOrderID(rs.getInt("orderId"));
+			items = getItemsOfOrder(order.getOrderId());
+			order.setItems(items);
 			favOrders.add(order);
-			order = "";
 
 		}
 
 		return favOrders;
+	}
+
+	public ArrayList<Order> getPrevOrders(int customerId) throws SQLException {
+		String sql = "SELECT orderId, orderTime, totalPrice"
+				+ " FROM Orders, Customer, Receipt"
+				+ " WHERE Orders.customerId = Customer.customerId"
+				+ " AND Orders.receiptId = Receipt.receiptId"
+				+ " AND Orders.customerId = ?";
+
+		PreparedStatement stmt;
+		stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, customerId);
+		ResultSet rs = stmt.executeQuery();
+		ArrayList<Order> prevOrders = new ArrayList<Order>();
+
+		while (rs.next()) {
+			Order order = new Order();
+			Reciept reciept = new Reciept();
+			ArrayList<Item> items = new ArrayList<Item>();
+
+			order.setOrderID(rs.getInt("orderId"));
+			items = getItemsOfOrder(order.getOrderId());
+			reciept.setOrderTime(rs.getTimestamp("orderTime"));
+			reciept.setTotal(rs.getDouble("totalPrice"));
+			order.setRecipt(reciept);
+			order.setItems(items);
+
+			prevOrders.add(order);
+
+		}
+
+		return prevOrders;
 	}
 
 	public int addOrder(int customerId, int receiptId, int cashierId,

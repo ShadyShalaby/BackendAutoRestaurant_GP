@@ -5,6 +5,11 @@ public class Corner {
 	private int cornerID;
 	private int tableNumber;
 
+	public Corner() {
+		cornerID = 0;
+		tableNumber = 0;
+	}
+
 	public Corner(int cornerID, int tableNumber) {
 		super();
 		this.cornerID = cornerID;

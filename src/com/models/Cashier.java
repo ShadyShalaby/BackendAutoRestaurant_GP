@@ -5,6 +5,12 @@ public class Cashier {
 	String cashierName;
 	String cashierPassword;
 
+	public Cashier() {
+		cashierId = 0;
+		cashierName = "";
+		cashierPassword = "";
+	}
+
 	public Cashier(int cashierId, String cashierName) {
 		this.cashierId = cashierId;
 		this.cashierName = cashierName;

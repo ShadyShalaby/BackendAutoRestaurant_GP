@@ -10,6 +10,15 @@ public class Reciept {
 	double Total;
 	Timestamp OrderTime; // date
 
+	public Reciept() {
+		ReciptID = 0;
+		SubTotal = 0.0;
+		Tax = 0.0;
+		Services = 0.0;
+		Total = 0.0;
+		OrderTime = new Timestamp(System.currentTimeMillis());
+	}
+
 	public Reciept(int ReciptID, double SubTotal, double Tax, double Services,
 			double Total, Timestamp OrderTime) {
 		this.ReciptID = ReciptID;

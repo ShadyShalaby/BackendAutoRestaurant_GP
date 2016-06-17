@@ -9,17 +9,28 @@ public class Item {
 	private int likes;
 	private int dislikes;
 	private String itemPic;
+	private int quantity;
+
+	public Item() {
+		itemID = 0;
+		itemName = "";
+		description = "";
+		price = 0.0;
+		likes = 0;
+		dislikes = 0;
+		quantity = 0;
+		itemPic = "";
+	}
 
 	public Item(int itemID, String itemName, String description, double price,
-			int likes, int dislikes) {
-		super();
+			int likes, int dislikes, String itemPic) {
 		this.itemID = itemID;
 		this.itemName = itemName;
 		this.description = description;
 		this.price = price;
 		this.likes = likes;
 		this.dislikes = dislikes;
-//		this.itemPic = itemPic;
+		this.itemPic = itemPic;
 	}
 
 	public int getItemID() {
@@ -78,4 +89,11 @@ public class Item {
 		this.itemPic = itemPic;
 	}
 
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
 }

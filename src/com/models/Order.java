@@ -1,29 +1,53 @@
 package com.models;
 
+import java.util.ArrayList;
+
 public class Order {
-	int OrderID;
+	int orderID;
 	boolean isFavOrder;
-	Reciept Reciept;
-	Corner Corner;
-	Cashier Cashier;
+	Reciept reciept;
+	Corner corner;
+	Cashier cashier;
+	ArrayList<Item> items;
 
-	public Order(int OrderID, boolean isFavOrder, Reciept reciept, Corner corner,
-			Cashier cashier) {
-		this.OrderID = OrderID;
+	public Order() {
+		orderID = 0;
+		isFavOrder = false;
+		reciept = new Reciept();
+		corner = new Corner();
+		cashier = new Cashier();
+		items = new ArrayList<Item>();
+	}
+
+	public Order(int OrderID, boolean isFavOrder, Reciept reciept,
+			Corner corner, Cashier cashier) {
+
+		this.orderID = OrderID;
 		this.isFavOrder = isFavOrder;
+		this.reciept = reciept;
+		this.corner = corner;
+		this.cashier = cashier;
+		items = new ArrayList<Item>();
+	}
 
-		this.Reciept = reciept;
-		this.Corner = corner;
-		this.Cashier = cashier;
+	public Order(int orderID, boolean isFavOrder, Reciept reciept,
+			Corner corner, Cashier cashier, ArrayList<Item> items) {
+		super();
+		this.orderID = orderID;
+		this.isFavOrder = isFavOrder;
+		this.reciept = reciept;
+		this.corner = corner;
+		this.cashier = cashier;
+		this.items = items;
 	}
 
 	// Setters & Getters
 	public void setOrderID(int OrderID) {
-		this.OrderID = OrderID;
+		this.orderID = OrderID;
 	}
 
 	public int getOrderId() {
-		return OrderID;
+		return orderID;
 	}
 
 	public void setIsFav(boolean isFavOrder) {
@@ -35,26 +59,34 @@ public class Order {
 	}
 
 	public void setRecipt(Reciept Recipt) {
-		this.Reciept = Recipt;
+		this.reciept = Recipt;
 	}
 
 	public Reciept getRecipt() {
-		return Reciept;
+		return reciept;
 	}
 
 	public void setcorner(Corner Corner) {
-		this.Corner = Corner;
+		this.corner = Corner;
 	}
 
 	public Corner getcorner() {
-		return Corner;
+		return corner;
 	}
 
 	public void setCashier(Cashier Cashier) {
-		this.Cashier = Cashier;
+		this.cashier = Cashier;
 	}
 
 	public Cashier getCashier() {
-		return Cashier;
+		return cashier;
+	}
+
+	public void setItems(ArrayList<Item> Items) {
+		this.items = Items;
+	}
+
+	public ArrayList<Item> getItems() {
+		return items;
 	}
 }

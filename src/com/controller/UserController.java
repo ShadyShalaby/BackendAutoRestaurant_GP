@@ -19,6 +19,7 @@ import com.beans.ItemBean;
 import com.beans.UserBean;
 import com.models.Item;
 import com.models.Menu;
+import com.models.Order;
 import com.models.Restaurant;
 import com.models.User;
 
@@ -74,27 +75,6 @@ public class UserController {
 		return json.toJSONString();
 	}
 
-	@GET
-	@Path("/viewFavOrders/{customerId}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String viewFavOrders(@PathParam("customeId") int customerId)
-			throws SQLException {
-		ArrayList<String> favOrders = new ArrayList<String>();
-
-		RestaurantController restaurantController = RestaurantController
-				.getInstance();
-		favOrders = restaurantController.sendCustomerId(customerId);
-		JSONArray jsonArray = new JSONArray();
-
-		for (int iter = 0; iter < favOrders.size(); iter++) {
-			JSONObject json = new JSONObject();
-			json.put("favOrder " + iter, favOrders.get(iter));
-			jsonArray.add(json);
-		}
-
-		return jsonArray.toJSONString();
-	}
-
 	@POST
 	@Path("/ProcessQRCode")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -108,7 +88,6 @@ public class UserController {
 		return restController.convertMenuToJSON(menu);
 	}
 
-	/************************** By Sheref Shokry **************************/
 	@POST
 	@Path("/likeItem")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -189,7 +168,7 @@ public class UserController {
 
 		return jsArray.toJSONString();
 	}
-	
+
 	@GET
 	@Path("/orderProcessing/{isFavOrder}/{subTotal}/{tax}/{services}/{total}/{orderTime}/{tableNumber}/{resturntId}/{cornerId}/{customerId}/{branchId}")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -221,8 +200,65 @@ public class UserController {
 
 	}
 
+	@GET
+	@Path("/viewFavOrders/{customerId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String viewFavOrders(@PathParam("customerId") int customerId)
+			throws SQLException {
+		ArrayList<Order> favOrders = new ArrayList<Order>();
 
-	/**********************************************************************/
+		RestaurantController restaurantController = RestaurantController
+				.getInstance();
+		favOrders = restaurantController.findFavOrders(customerId);
+		JSONArray jsonArray = new JSONArray();
+
+		for (Order order : favOrders) {
+			JSONObject json = new JSONObject();
+			String items = "";
+			for (Item item : order.getItems()) {
+				items += item.getItemName() + ",," + item.getDescription()
+						+ ",," + item.getPrice() + ",," + item.getQuantity()
+						+ "##";
+			}
+
+			json.put(order.getOrderId(), items);
+			jsonArray.add(json);
+		}
+
+		return jsonArray.toJSONString();
+	}
+
+	@GET
+	@Path("/viewPrevOrders/{customerId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String viewPrevOrders(@PathParam("customerId") int customerId)
+			throws SQLException {
+		ArrayList<Order> prevOrders = new ArrayList<Order>();
+
+		RestaurantController restaurantController = RestaurantController
+				.getInstance();
+
+		prevOrders = restaurantController.findPrevOrders(customerId);
+
+		JSONArray jsonArray = new JSONArray();
+
+		for (Order order : prevOrders) {
+			JSONObject json = new JSONObject();
+			String rec = order.getRecipt().getOrderTime() + ",,"
+					+ order.getRecipt().getTotal();
+			String items = "";
+			for (Item item : order.getItems()) {
+				items += item.getItemName() + ",," + item.getDescription()
+						+ ",," + item.getPrice() + ",," + item.getQuantity()
+						+ "##";
+			}
+
+			json.put(order.getOrderId(), rec + "@@" + items);
+			jsonArray.add(json);
+		}
+
+		return jsonArray.toJSONString();
+	}
 
 	@GET
 	@Path("/")
