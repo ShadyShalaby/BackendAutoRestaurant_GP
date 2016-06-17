@@ -23,6 +23,17 @@ public class Item {
 	}
 
 	public Item(int itemID, String itemName, String description, double price,
+			int likes, int dislikes) {
+		this.itemID = itemID;
+		this.itemName = itemName;
+		this.description = description;
+		this.price = price;
+		this.likes = likes;
+		this.dislikes = dislikes;
+		this.itemPic = "";
+	}
+
+	public Item(int itemID, String itemName, String description, double price,
 			int likes, int dislikes, String itemPic) {
 		this.itemID = itemID;
 		this.itemName = itemName;
