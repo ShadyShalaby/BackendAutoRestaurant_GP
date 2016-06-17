@@ -103,6 +103,7 @@ public class OrderBean {
 	public int addOrder(int customerId, int receiptId, int cashierId,
 			int branchId, int cornerId, int restaurantId, boolean isFavOrder)
 			throws SQLException {
+
 		String sql = "Insert into Orders "
 				+ "(customerId,receiptId,cashierId,branchId,cornerId,restaurantId,isFavOrder)"
 				+ " VALUES  (?,?,?,?,?,?,?) ";
@@ -130,6 +131,26 @@ public class OrderBean {
 		}
 
 		return id;
+	}
+
+	public String addFavOrder(int customerId, int orderId) throws SQLException {
+
+		String sql = "UPDATE Orders SET isFavOrder =1"
+				+ " WHERE Orders.customerId= ? AND Orders.orderId= ?";
+
+		PreparedStatement stmt = null;
+
+		stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, customerId);
+		stmt.setInt(2, orderId);
+		int nRows = stmt.executeUpdate();
+		String state = "";
+		if (nRows > 0)
+			state = "true";
+		else
+			state = "false";
+
+		return state;
 	}
 
 }

@@ -43,11 +43,10 @@ public class UserBean {
 		return user;
 	}
 
-	public User addUser(String userName, String email, String phone, String pass){
+	public User addUser(String userName, String email, String phone, String pass) {
 
 		String sql = "Insert into Customer"
-				+ " (userName, email, phone, customerPassword)" 
-				+ " VALUES ('"
+				+ " (userName, email, phone, customerPassword)" + " VALUES ('"
 				+ userName + "','" + email + "','" + phone + "','" + pass
 				+ "')";
 
@@ -55,10 +54,11 @@ public class UserBean {
 		int id = 0;
 		try {
 			Statement stmt = (Statement) conn.createStatement();
-			int nRows = stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+			int nRows = stmt
+					.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 
 			ResultSet rs = stmt.getGeneratedKeys();
-			if(rs.next()){
+			if (rs.next()) {
 				id = rs.getInt(1);
 			}
 			if (nRows == 1) {
@@ -69,11 +69,40 @@ public class UserBean {
 				user.setEmail(email);
 				user.setPassword(pass);
 				user.setPhone(phone);
-			} 
+			}
 		} catch (SQLException e) {
 		}
 
 		return user;
+	}
+
+	/******************************************************************/
+
+	public String updateUser(String userName, String email, String phone,
+			String pass, int customerId) throws SQLException {
+		String sql = "UPDATE Customer SET userName =?"
+				+ ",email =?,phone =?,customerPassword=? WHERE customerId =? ";
+
+		String state = "false";
+
+		try {
+			PreparedStatement stmt;
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, userName);
+			stmt.setString(2, email);
+			stmt.setString(3, phone);
+			stmt.setString(4, pass);
+			stmt.setInt(5, customerId);
+
+			int numberOfRows = stmt.executeUpdate();
+
+			if (numberOfRows == 1) {
+				state = "true";
+			}
+		} catch (SQLException e) {
+		}
+
+		return state;
 	}
 
 }

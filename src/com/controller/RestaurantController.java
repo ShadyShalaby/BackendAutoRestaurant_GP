@@ -12,18 +12,15 @@ import com.beans.ItemBean;
 import com.beans.OrderBean;
 import com.beans.RecieptBean;
 import com.beans.RestaurantBean;
-import com.models.Branch;
 import com.models.Cashier;
 import com.models.Category;
 import com.models.Corner;
 import com.models.Item;
 import com.models.Menu;
-import com.models.MenuBuilder;
 import com.models.Order;
 import com.models.Reciept;
 import com.models.Restaurant;
 import com.models.ResturantBuilder;
-import com.models.Review;
 
 public class RestaurantController {
 
@@ -242,6 +239,17 @@ public class RestaurantController {
 		prevOrders = orderBean.getPrevOrders(customerId);
 
 		return prevOrders;
+	}
+
+	public String addFavRestaurant(int customerId, int restID)
+			throws SQLException {
+		RestaurantBean restaurantBean = new RestaurantBean();
+		return restaurantBean.AddFavRestaurant(customerId, restID);
+	}
+
+	public String addFavOrder(int customerId, int orderId) throws SQLException {
+		OrderBean orderBean = new OrderBean();
+		return orderBean.addFavOrder(customerId, orderId);
 	}
 
 	/**************************************************************************/

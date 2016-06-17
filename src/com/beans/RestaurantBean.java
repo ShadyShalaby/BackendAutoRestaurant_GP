@@ -6,10 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.models.Branch;
-import com.models.Menu;
 import com.models.Restaurant;
-import com.models.Review;
+import com.mysql.jdbc.Statement;
 
 public class RestaurantBean {
 
@@ -36,7 +34,7 @@ public class RestaurantBean {
 
 	public Restaurant getRestaurantInfo(int restId) throws SQLException {
 
-		Restaurant restaurant ;
+		Restaurant restaurant;
 
 		String sql = "Select * from Restaurant where restaurantId = ?";
 
@@ -66,7 +64,7 @@ public class RestaurantBean {
 			restaurant.setWorkingHours(workingHours);
 			restaurant.setTimeForDeliver(timeForDeliver);
 			restaurant.setType(type);
-		} else 
+		} else
 			restaurant = null;
 
 		/*
@@ -76,6 +74,52 @@ public class RestaurantBean {
 		 */
 
 		return restaurant;
+	}
+
+	/******************************************************************/
+
+	public String getFavouriteRestaurants(int customerId) throws SQLException {
+		String sql = "Select favRestaurant from Customer where customerId =?";
+
+		PreparedStatement stmt;
+		stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, customerId);
+
+		String rest = "";
+		ResultSet rs = stmt.executeQuery();
+
+		if (rs.next()) {
+			rest = rs.getString("favRestaurant");
+		}
+
+		return rest;
+	}
+
+	public String AddFavRestaurant(int customerId, int restID)
+			throws SQLException {
+
+		String value = getFavouriteRestaurants(customerId);
+
+		if (value.length() == 0 || value.equals(0))
+			value = String.valueOf(restID);
+
+		else if (value.length() != 0)
+			value += "," + String.valueOf(restID);
+
+		int nRows;
+		try {
+			String sql = "UPDATE Customer " + "SET favRestaurant = '" 
+					+ value + "' " + "WHERE customerId = " + customerId;
+
+			Statement stmt;
+			stmt = (Statement) conn.createStatement();
+			nRows = stmt.executeUpdate(sql);
+			if (nRows > 0)
+				return "true";
+		} catch (SQLException e) {
+		}
+
+		return "false";
 	}
 
 }

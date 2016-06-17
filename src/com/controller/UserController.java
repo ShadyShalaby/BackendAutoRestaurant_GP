@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.beans.ItemBean;
+import com.beans.OrderBean;
 import com.beans.UserBean;
 import com.models.Item;
 import com.models.Menu;
@@ -173,6 +174,57 @@ public class UserController {
 
 		return jsArray.toJSONString();
 	}
+
+	@POST
+	@Path("/addFavOrder")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String addFavOrder(@FormParam("customerId") int customerId,
+			@FormParam("orderId") int orderId) throws SQLException {
+
+		RestaurantController restController = RestaurantController
+				.getInstance();
+		String status = restController.addFavOrder(customerId, orderId);
+
+		JSONObject json = new JSONObject();
+		json.put("status", status);
+		return json.toJSONString();
+	}
+
+	@POST
+	@Path("/addFavRestaurant")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String addFavRestaurant(@FormParam("customerId") int customerId,
+			@FormParam("restID") int restID) throws SQLException {
+
+		RestaurantController restController = RestaurantController
+				.getInstance();
+		String status = restController.addFavRestaurant(customerId, restID);
+
+		JSONObject json = new JSONObject();
+		json.put("status", status);
+
+		return json.toJSONString();
+	}
+
+	@POST
+	@Path("/updateProfile")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String updateProfile(@FormParam("userName") String userName,
+			@FormParam("email") String email, @FormParam("phone") String phone,
+			@FormParam("password") String pass,
+			@FormParam("customerId") int customerId) throws SQLException {
+
+		UserBean userBean = new UserBean();
+		String state = userBean.updateUser(userName, email, phone, pass,
+				customerId);
+
+		JSONObject json = new JSONObject();
+		json.put("status", state);
+
+		return json.toJSONString();
+	}
+
+	/*********************************************************************/
 
 	@GET
 	@Path("/orderProcessing/{isFavOrder}/{subTotal}/{tax}/{service}/{total}/{orderTime}/{tableNumber}/{restId}/{cornerId}/{customerId}/{branchId}")
