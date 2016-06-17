@@ -1,6 +1,7 @@
 package com.controller;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import javax.ws.rs.FormParam;
@@ -188,6 +189,38 @@ public class UserController {
 
 		return jsArray.toJSONString();
 	}
+	
+	@GET
+	@Path("/orderProcessing/{isFavOrder}/{subTotal}/{tax}/{services}/{total}/{orderTime}/{tableNumber}/{resturntId}/{cornerId}/{customerId}/{branchId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String searchByCategory(@PathParam("isFavOrder") boolean isFavOrder,
+			@PathParam("subTotal") double subTotal,
+			@PathParam("tax") double tax,
+			@PathParam("services") double services,
+			@PathParam("total") double total,
+			@PathParam("orderTime") Timestamp orderTime,
+			@PathParam("tableNumber") int tableNumber,
+			@PathParam("resturntId") int resturntId,
+			@PathParam("cornerId") int cornerId,
+			@PathParam("customerId") int customerId,
+			@PathParam("branchId") int branchId) throws SQLException {
+
+		RestaurantController restController = RestaurantController
+				.getInstance();
+
+		int orderId = restController.createOrder(isFavOrder, subTotal, tax,
+				services, total, orderTime, tableNumber, resturntId, cornerId,
+				customerId, branchId);
+
+		JSONObject json = new JSONObject();
+
+		json.put("status", "true");
+		json.put("orderId", orderId);
+
+		return json.toJSONString();
+
+	}
+
 
 	/**********************************************************************/
 

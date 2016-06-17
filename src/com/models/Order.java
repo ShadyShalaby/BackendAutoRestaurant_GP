@@ -7,7 +7,7 @@ public class Order {
 	Corner Corner;
 	Cashier Cashier;
 
-	Order(int OrderID, boolean isFavOrder, Reciept reciept, Corner corner,
+	public Order(int OrderID, boolean isFavOrder, Reciept reciept, Corner corner,
 			Cashier cashier) {
 		this.OrderID = OrderID;
 		this.isFavOrder = isFavOrder;

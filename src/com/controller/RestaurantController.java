@@ -1,18 +1,25 @@
 package com.controller;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.beans.CashierBean;
 import com.beans.OrderBean;
+import com.beans.RecieptBean;
 import com.beans.RestaurantBean;
 import com.models.Branch;
+import com.models.Cashier;
 import com.models.Category;
+import com.models.Corner;
 import com.models.Item;
 import com.models.Menu;
 import com.models.MenuBuilder;
+import com.models.Order;
+import com.models.Reciept;
 import com.models.Restaurant;
 import com.models.ResturantBuilder;
 import com.models.Review;
@@ -82,7 +89,6 @@ public class RestaurantController {
 
 		for (Category cat : menu.getCategories()) {
 			String items = "";
-			JSONObject json = new JSONObject();
 
 			for (Item item : cat.getItems()) {
 				items += item.getItemID() + ",," + item.getItemName() + ",,"
@@ -91,11 +97,12 @@ public class RestaurantController {
 						+ item.getItemPic() + "##";
 			}
 
-			json.put(cat.getCategoryID(), cat.getCategoryName() + "||" + items);
-			jsonArray.add(json);
+			jsonArray.add(cat.getCategoryName() + "@@" + items);
 		}
 
-		return jsonArray.toJSONString();
+		JSONObject json = new JSONObject();
+		json.put("menu", jsonArray);
+		return json.toJSONString();
 	}
 
 	/************************** By Sheref Shokry **************************/
@@ -125,6 +132,7 @@ public class RestaurantController {
 				}
 			}
 		}
+
 		/*
 		 * ArrayList<Menu> menuList = new ArrayList<Menu>(); MenuBuilder menu =
 		 * new MenuBuilder();
@@ -153,6 +161,29 @@ public class RestaurantController {
 	}
 
 	/**********************************************************************/
+
+	public int createOrder(boolean isFavOrder, double subTotal, double tax,
+			double services, double total, Timestamp orderTime,
+			int tableNumber, int restaurantId, int cornerId, int customerId,
+			int branchId) throws SQLException {
+		CashierBean cashierBean = new CashierBean();
+		RecieptBean recieptBean = new RecieptBean();
+		OrderBean orderBean = new OrderBean();
+
+		Cashier cashier = cashierBean.getCashierInfo(restaurantId);
+		int recieptID = recieptBean.addReceipt(subTotal, tax, services, total,
+				orderTime);
+		int orderID = orderBean.addOrder(customerId, recieptID,
+				cashier.getCashierId(), branchId, cornerId, restaurantId,
+				isFavOrder);
+
+		Reciept receipt = new Reciept(recieptID, subTotal, tax, services,
+				total, orderTime);
+		Corner corner = new Corner(cornerId, tableNumber);
+		Order order = new Order(orderID, isFavOrder, receipt, corner, cashier);
+
+		return orderID;
+	}
 
 	public ArrayList<String> sendCustomerId(int customerId) throws SQLException {
 		OrderBean orderBean = new OrderBean();

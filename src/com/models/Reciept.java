@@ -10,7 +10,7 @@ public class Reciept {
 	double Total;
 	Timestamp OrderTime; // date
 
-	Reciept(int ReciptID, double SubTotal, double Tax, double Services,
+	public Reciept(int ReciptID, double SubTotal, double Tax, double Services,
 			double Total, Timestamp OrderTime) {
 		this.ReciptID = ReciptID;
 		this.SubTotal = SubTotal;
