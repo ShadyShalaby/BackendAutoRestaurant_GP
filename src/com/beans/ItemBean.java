@@ -50,151 +50,189 @@ public class ItemBean {
 
 	/************************** By Sheref Shokry **************************/
 
-	public int likeItem(int itemId, int userId, int restaurantId)
+	public int[] likeItem(int itemId, int userId, int restaurantId)
 			throws SQLException {
 
 		String sql = "Select * from Item where `itemId` = ?";
 
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
-
 		stmt.setInt(1, itemId);
 		ResultSet rs = stmt.executeQuery();
 
 		int likes = 0;
 		int disLikes = 0;
+
 		if (rs.next()) {
 			likes = rs.getInt("likes");
 			disLikes = rs.getInt("disLikes");
-			likes++;
-
-			sql = "Update Item " + "SET likes=?" + " where `itemId` =?";
-
-			PreparedStatement stmt2;
-			stmt2 = conn.prepareStatement(sql);
-			stmt2.setInt(1, likes);
-			stmt2.setInt(2, itemId);
-			stmt2.executeUpdate();
-
 		}
 
-		sql = "Select * from ItemCustomer where `itemId` =? ";
+		sql = "Select * from ItemCustomer where `itemId` = ?";
 
-		PreparedStatement stmt3;
-		stmt3 = conn.prepareStatement(sql);
+		stmt = conn.prepareStatement(sql);
 
-		stmt3.setInt(1, itemId);
-		ResultSet rs2 = stmt3.executeQuery();
+		stmt.setInt(1, itemId);
+		ResultSet rs2 = stmt.executeQuery();
 
-		if (!rs2.next()) {
+		if (rs2.next()) {
+
+			sql = "Update ItemCustomer " + "SET isLike=?"
+					+ " where `itemId` = ? AND `customerId` = ?";
+
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, 1);
+			stmt.setInt(2, itemId);
+			stmt.setInt(3, userId);
+			int nRows = stmt.executeUpdate();
+
+			if (nRows == 1) {
+
+				likes++;
+				sql = "Update Item " + "SET likes=?" + " where `itemId` =?";
+
+				stmt = conn.prepareStatement(sql);
+				stmt.setInt(1, likes);
+				stmt.setInt(2, itemId);
+				stmt.executeUpdate();
+
+				disLikes--;
+				sql = "Update Item " + "SET disLikes=?" + " where `itemId` =?";
+
+				stmt = conn.prepareStatement(sql);
+				stmt.setInt(1, disLikes);
+				stmt.setInt(2, itemId);
+				stmt.executeUpdate();
+			}
+
+		} else {
 
 			sql = "Insert into ItemCustomer "
 					+ "(customerId,itemId,restaurantId,isLike)"
 					+ " VALUES  (?,?,?,?) ";
 
-			PreparedStatement stmt4;
-			stmt4 = conn.prepareStatement(sql);
-			stmt4.setInt(1, userId);
-			stmt4.setInt(2, itemId);
-			stmt4.setInt(3, restaurantId);
-			stmt4.setInt(4, 1);
-			stmt4.executeUpdate();
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, userId);
+			stmt.setInt(2, itemId);
+			stmt.setInt(3, restaurantId);
+			stmt.setInt(4, 1);
+			stmt.executeUpdate();
 
-		} else {
+			likes++;
+			sql = "Update Item " + "SET likes=?" + " where `itemId` =?";
 
-			sql = "Update ItemCustomer " + "SET isLike=?"
-					+ " where `itemId` =?";
-
-			PreparedStatement stmt2;
-			stmt2 = conn.prepareStatement(sql);
-			stmt2.setInt(1, 1);
-			stmt2.setInt(2, itemId);
-			stmt2.executeUpdate();
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, likes);
+			stmt.setInt(2, itemId);
+			stmt.executeUpdate();
 
 			disLikes--;
 			sql = "Update Item " + "SET disLikes=?" + " where `itemId` =?";
 
-			PreparedStatement stmt5;
-			stmt5 = conn.prepareStatement(sql);
-			stmt5.setInt(1, disLikes);
-			stmt5.setInt(2, itemId);
-			stmt5.executeUpdate();
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, disLikes);
+			stmt.setInt(2, itemId);
+			stmt.executeUpdate();
 
 		}
+		stmt.close();
 
-		return likes;
+		int arr[] = { likes, disLikes };
+
+		return arr;
 	}
 
-	public int disLikeItem(int itemId, int userId, int restaurantId)
+	public int[] disLikeItem(int itemId, int userId, int restaurantId)
 			throws SQLException {
 
-		String sql = "Select * from Item where `itemId` =? ";
+		String sql = "Select * from Item where `itemId` = ?";
 
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sql);
-
 		stmt.setInt(1, itemId);
 		ResultSet rs = stmt.executeQuery();
 
-		int disLikes = 0;
 		int likes = 0;
+		int disLikes = 0;
+
 		if (rs.next()) {
-			disLikes = rs.getInt("disLikes");
 			likes = rs.getInt("likes");
-			disLikes++;
-
-			sql = "Update Item " + "SET disLikes=?" + " where `itemId` =?";
-
-			PreparedStatement stmt2;
-			stmt2 = conn.prepareStatement(sql);
-			stmt2.setInt(1, disLikes);
-			stmt2.setInt(2, itemId);
-			stmt2.executeUpdate();
+			disLikes = rs.getInt("disLikes");
 		}
 
-		sql = "Select * from ItemCustomer where `itemId` =? ";
+		sql = "Select * from ItemCustomer where `itemId` = ?";
 
-		PreparedStatement stmt3;
-		stmt3 = conn.prepareStatement(sql);
+		stmt = conn.prepareStatement(sql);
 
-		stmt3.setInt(1, itemId);
-		ResultSet rs2 = stmt3.executeQuery();
+		stmt.setInt(1, itemId);
+		ResultSet rs2 = stmt.executeQuery();
 
-		if (!rs2.next()) {
+		if (rs2.next()) {
+
+			sql = "Update ItemCustomer " + "SET isLike=?"
+					+ " where `itemId` = ? AND `customerId` = ?";
+
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, 0);
+			stmt.setInt(2, itemId);
+			stmt.setInt(3, userId);
+			int nRows = stmt.executeUpdate();
+
+			if (nRows == 1) {
+
+				likes--;
+				sql = "Update Item " + "SET likes=?" + " where `itemId` =?";
+
+				stmt = conn.prepareStatement(sql);
+				stmt.setInt(1, likes);
+				stmt.setInt(2, itemId);
+				stmt.executeUpdate();
+
+				disLikes++;
+				sql = "Update Item " + "SET disLikes=?" + " where `itemId` =?";
+
+				stmt = conn.prepareStatement(sql);
+				stmt.setInt(1, disLikes);
+				stmt.setInt(2, itemId);
+				stmt.executeUpdate();
+			}
+
+		} else {
 
 			sql = "Insert into ItemCustomer "
 					+ "(customerId,itemId,restaurantId,isLike)"
 					+ " VALUES  (?,?,?,?) ";
 
-			PreparedStatement stmt4;
-			stmt4 = conn.prepareStatement(sql);
-			stmt4.setInt(1, userId);
-			stmt4.setInt(2, itemId);
-			stmt4.setInt(3, restaurantId);
-			stmt4.setInt(4, 0);
-			stmt4.executeUpdate();
-		} else {
-			sql = "Update ItemCustomer " + "SET isLike=?"
-					+ " where `itemId` =?";
-
-			PreparedStatement stmt2;
-			stmt2 = conn.prepareStatement(sql);
-			stmt2.setInt(1, 0);
-			stmt2.setInt(2, itemId);
-			stmt2.executeUpdate();
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, userId);
+			stmt.setInt(2, itemId);
+			stmt.setInt(3, restaurantId);
+			stmt.setInt(4, 0);
+			stmt.executeUpdate();
 
 			likes--;
 			sql = "Update Item " + "SET likes=?" + " where `itemId` =?";
 
-			PreparedStatement stmt5;
-			stmt5 = conn.prepareStatement(sql);
-			stmt5.setInt(1, likes);
-			stmt5.setInt(2, itemId);
-			stmt5.executeUpdate();
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, likes);
+			stmt.setInt(2, itemId);
+			stmt.executeUpdate();
+
+			disLikes++;
+			sql = "Update Item " + "SET disLikes=?" + " where `itemId` =?";
+
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, disLikes);
+			stmt.setInt(2, itemId);
+			stmt.executeUpdate();
 
 		}
 
-		return disLikes;
+		stmt.close();
+
+		int arr[] = { likes, disLikes };
+
+		return arr;
 	}
 	/**********************************************************************/
 

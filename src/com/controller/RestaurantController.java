@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.beans.CashierBean;
+import com.beans.ItemBean;
 import com.beans.OrderBean;
 import com.beans.RecieptBean;
 import com.beans.RestaurantBean;
@@ -158,10 +159,54 @@ public class RestaurantController {
 		return jsObj;
 	}
 
+	public int[] likeItem(int restID, int itemID, int userID)
+			throws SQLException {
+
+		ItemBean itembean = new ItemBean();
+		int[] arr = itembean.likeItem(itemID, userID, restID);
+
+		updateItemLikes(restID, itemID, arr);
+
+		return arr;
+	}
+
+	public int[] dislikeItem(int restID, int itemID, int userID)
+			throws SQLException {
+
+		ItemBean itembean = new ItemBean();
+		int[] arr = itembean.disLikeItem(itemID, userID, restID);
+
+		updateItemLikes(restID, itemID, arr);
+
+		return arr;
+	}
+
+	public boolean updateItemLikes(int restID, int itemID, int[] likes) {
+
+		for (Restaurant restaurant : restaurants) {
+
+			if (restaurant.getRestaurantID() == restID) {
+				for (Category category : restaurant.getMenu().getCategories()) {
+					for (Item item : category.getItems()) {
+						if (item.getItemID() == itemID) {
+							item.setLikes(likes[0]);
+							item.setDislikes(likes[1]);
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/**************************************************************************/
+
 	public int createOrder(boolean isFavOrder, double subTotal, double tax,
 			double services, double total, Timestamp orderTime,
 			int tableNumber, int restaurantId, int cornerId, int customerId,
 			int branchId) throws SQLException {
+
 		CashierBean cashierBean = new CashierBean();
 		RecieptBean recieptBean = new RecieptBean();
 		OrderBean orderBean = new OrderBean();
@@ -181,10 +226,8 @@ public class RestaurantController {
 		return orderID;
 	}
 
-	/**************************************************************************/
-
 	public ArrayList<Order> findFavOrders(int customerId) throws SQLException {
-		
+
 		OrderBean orderBean = new OrderBean();
 		ArrayList<Order> favOrders = new ArrayList<Order>();
 		favOrders = orderBean.getFavOrders(customerId);

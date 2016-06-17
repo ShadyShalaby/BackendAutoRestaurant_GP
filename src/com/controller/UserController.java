@@ -95,13 +95,16 @@ public class UserController {
 			@FormParam("userId") int userId,
 			@FormParam("restaurantId") int restaurantId) throws SQLException {
 
-		ItemBean itembean = new ItemBean();
-		int likes = itembean.likeItem(itemId, userId, restaurantId);
+		RestaurantController restController = RestaurantController
+				.getInstance();
+
+		int arr[] = restController.likeItem(restaurantId, itemId, userId);
 
 		JSONObject json = new JSONObject();
 
 		json.put("status", "true");
-		json.put("nLikes", likes);
+		json.put("nLikes", arr[0]);
+		json.put("nDisLikes", arr[1]);
 
 		return json.toJSONString();
 	}
@@ -113,13 +116,15 @@ public class UserController {
 			@FormParam("userId") int userId,
 			@FormParam("restaurantId") int restaurantId) throws SQLException {
 
-		ItemBean itembean = new ItemBean();
-		int disLikes = itembean.disLikeItem(itemId, userId, restaurantId);
+		RestaurantController restController = RestaurantController
+				.getInstance();
+		int arr[] = restController.dislikeItem(restaurantId, itemId, userId);
 
 		JSONObject json = new JSONObject();
 
 		json.put("status", "true");
-		json.put("nDislikes", disLikes);
+		json.put("nLikes", arr[0]);
+		json.put("nDisLikes", arr[1]);
 
 		return json.toJSONString();
 	}
@@ -170,16 +175,16 @@ public class UserController {
 	}
 
 	@GET
-	@Path("/orderProcessing/{isFavOrder}/{subTotal}/{tax}/{services}/{total}/{orderTime}/{tableNumber}/{resturntId}/{cornerId}/{customerId}/{branchId}")
+	@Path("/orderProcessing/{isFavOrder}/{subTotal}/{tax}/{service}/{total}/{orderTime}/{tableNumber}/{restId}/{cornerId}/{customerId}/{branchId}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String searchByCategory(@PathParam("isFavOrder") boolean isFavOrder,
 			@PathParam("subTotal") double subTotal,
 			@PathParam("tax") double tax,
-			@PathParam("services") double services,
+			@PathParam("service") double services,
 			@PathParam("total") double total,
 			@PathParam("orderTime") Timestamp orderTime,
 			@PathParam("tableNumber") int tableNumber,
-			@PathParam("resturntId") int resturntId,
+			@PathParam("restId") int resturntId,
 			@PathParam("cornerId") int cornerId,
 			@PathParam("customerId") int customerId,
 			@PathParam("branchId") int branchId) throws SQLException {
