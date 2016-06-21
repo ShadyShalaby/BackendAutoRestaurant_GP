@@ -18,6 +18,7 @@ import org.json.simple.JSONObject;
 import com.beans.ItemBean;
 import com.beans.OrderBean;
 import com.beans.UserBean;
+import com.models.Branch;
 import com.models.Item;
 import com.models.Menu;
 import com.models.Order;
@@ -86,7 +87,7 @@ public class UserController {
 
 		Menu menu = restController.getRestaurantMenu(restID);
 
-		return restController.convertMenuToJSON(menu);
+		return restController.convertMenuToJSON(menu).toJSONString();
 	}
 
 	@POST
@@ -115,11 +116,17 @@ public class UserController {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String disLike(@FormParam("itemId") int itemId,
 			@FormParam("userId") int userId,
-			@FormParam("restaurantId") int restaurantId) throws SQLException {
+			@FormParam("restaurantId") int restaurantId) {
 
 		RestaurantController restController = RestaurantController
 				.getInstance();
-		int arr[] = restController.dislikeItem(restaurantId, itemId, userId);
+		int arr[] = null;
+		try {
+			arr = restController.dislikeItem(restaurantId, itemId, userId);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		JSONObject json = new JSONObject();
 
@@ -150,7 +157,9 @@ public class UserController {
 			jsArray.add(jsObj);
 		}
 
-		return jsArray.toJSONString();
+		JSONObject json = new JSONObject();
+		json.put("list", jsArray);
+		return json.toJSONString();
 	}
 
 	@POST
@@ -172,7 +181,9 @@ public class UserController {
 			jsArray.add(jsObj);
 		}
 
-		return jsArray.toJSONString();
+		JSONObject json = new JSONObject();
+		json.put("list", jsArray);
+		return json.toJSONString();
 	}
 
 	@POST
@@ -224,16 +235,54 @@ public class UserController {
 		return json.toJSONString();
 	}
 
+	@POST
+	@Path("/getRestTaxServices")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getRestaurantTaxServices(@FormParam("restID") int restID)
+			throws SQLException {
+
+		RestaurantController restController = RestaurantController
+				.getInstance();
+
+		JSONObject json = restController.getRestaurantTaxJSON(restID);
+
+		return json.toJSONString();
+	}
+
+	@POST
+	@Path("/getRestaurantMenu")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getRestaurantMenu(@FormParam("restID") int restID) {
+
+		RestaurantController restController = RestaurantController
+				.getInstance();
+
+		Menu menu = restController.getRestaurantMenu(restID);
+
+		return restController.convertMenuToJSON(menu).toJSONString();
+	}
+
+	@POST
+	@Path("/getRestaurantBranches")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getRestaurantBranches(@FormParam("restID") int restID) {
+
+		RestaurantController restController = RestaurantController
+				.getInstance();
+
+		ArrayList<Branch> branches = restController.getBranches(restID);
+
+		return restController.convertBranchesToJSON(branches).toJSONString();
+	}
+
 	/*********************************************************************/
 
 	@GET
-	@Path("/orderProcessing/{isFavOrder}/{subTotal}/{tax}/{service}/{total}/{orderTime}/{tableNumber}/{restId}/{cornerId}/{customerId}/{branchId}")
+	@Path("/orderProcessing/{subTotal}/{tax}/{service}/{total}/{orderTime}/{tableNumber}/{restId}/{cornerId}/{customerId}/{branchId}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String searchByCategory(@PathParam("isFavOrder") boolean isFavOrder,
-			@PathParam("subTotal") double subTotal,
-			@PathParam("tax") double tax,
-			@PathParam("service") double services,
-			@PathParam("total") double total,
+	public String orderProcessing(@PathParam("subTotal") double subTotal,
+			@PathParam("tax") double services,
+			@PathParam("service") double tax, @PathParam("total") double total,
 			@PathParam("orderTime") Timestamp orderTime,
 			@PathParam("tableNumber") int tableNumber,
 			@PathParam("restId") int resturntId,
@@ -244,7 +293,7 @@ public class UserController {
 		RestaurantController restController = RestaurantController
 				.getInstance();
 
-		int orderId = restController.createOrder(isFavOrder, subTotal, tax,
+		int orderId = restController.createOrder(false, subTotal, tax,
 				services, total, orderTime, tableNumber, resturntId, cornerId,
 				customerId, branchId);
 

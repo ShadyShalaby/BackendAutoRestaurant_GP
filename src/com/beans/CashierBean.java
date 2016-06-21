@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.models.Cashier;
-import com.models.User;
 
 public class CashierBean {
 

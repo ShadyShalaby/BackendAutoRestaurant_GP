@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.models.Branch;
+import com.models.Menu;
 import com.models.Restaurant;
+import com.models.Review;
 import com.mysql.jdbc.Statement;
 
 public class RestaurantBean {
@@ -44,7 +47,10 @@ public class RestaurantBean {
 		ResultSet rs = stmt.executeQuery();
 
 		if (rs.next()) {
+//			String logo;
+	
 			restaurant = new Restaurant();
+
 			int restaurantID = rs.getInt("restaurantId");
 			String restName = rs.getString("restaurantName");
 			double rating = rs.getDouble("rating");
@@ -54,6 +60,8 @@ public class RestaurantBean {
 			String workingHours = rs.getString("workingHours");
 			String timeForDeliver = rs.getString("timeForDeliver");
 			String[] type = rs.getString("restaurantType").split(",");
+			double tax = rs.getDouble("tax");
+			double services = rs.getDouble("services");
 
 			restaurant.setRestaurantID(restaurantID);
 			restaurant.setRestName(restName);
@@ -64,12 +72,13 @@ public class RestaurantBean {
 			restaurant.setWorkingHours(workingHours);
 			restaurant.setTimeForDeliver(timeForDeliver);
 			restaurant.setType(type);
+			restaurant.setServices(services);
+			restaurant.setTax(tax);
 		} else
 			restaurant = null;
 
 		/*
 		 * ArrayList<Review> reviews = new ArrayList<Review>();
-		 * ArrayList<Branch> restaurantBranches = new ArrayList<Branch>();
 		 * String logo;
 		 */
 

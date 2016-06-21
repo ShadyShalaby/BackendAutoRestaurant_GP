@@ -7,6 +7,12 @@ public class Branch {
 	String location;
 	String address;
 	ArrayList<Corner> corners = new ArrayList<Corner>();
+	
+	public Branch() {
+		branchId = 0;
+		location = "";
+		address = "";
+	}
 
 	public Branch(int branchId, String location, String address) {
 		this.branchId = branchId;

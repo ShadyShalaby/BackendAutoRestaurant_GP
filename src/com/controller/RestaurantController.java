@@ -3,15 +3,18 @@ package com.controller;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.models.ResturantBuilder;
 import com.beans.CashierBean;
 import com.beans.ItemBean;
 import com.beans.OrderBean;
 import com.beans.RecieptBean;
 import com.beans.RestaurantBean;
+import com.models.Branch;
 import com.models.Cashier;
 import com.models.Category;
 import com.models.Corner;
@@ -20,7 +23,6 @@ import com.models.Menu;
 import com.models.Order;
 import com.models.Reciept;
 import com.models.Restaurant;
-import com.models.ResturantBuilder;
 
 public class RestaurantController {
 
@@ -44,6 +46,7 @@ public class RestaurantController {
 	}
 
 	private void buildAllRestaurants() throws SQLException {
+
 		RestaurantBean restBean = new RestaurantBean();
 		ResturantBuilder restBuilder = new ResturantBuilder();
 
@@ -56,6 +59,106 @@ public class RestaurantController {
 			Restaurant restaurant = restBuilder.buildRestaurant(menuID);
 			restaurants.add(restaurant);
 		}
+	}
+
+	public JSONObject convertRestaurantToJSON(Restaurant restaurant) {
+		JSONObject jsObj = new JSONObject();
+
+		jsObj.put("RestID", restaurant.getRestaurantID());
+		jsObj.put("RestName", restaurant.getRestName());
+		jsObj.put("RestLogo", restaurant.getLogo());
+		jsObj.put("RestRating", restaurant.getRating());
+		jsObj.put("RestHotline", restaurant.getHotLine());
+		jsObj.put("RestType",
+				Arrays.toString(restaurant.getType()).replace(", ", ",")
+						.replaceAll("[\\[\\]]", ""));
+		jsObj.put("RestWHours", restaurant.getWorkingHours());
+
+		return jsObj;
+	}
+
+	public JSONObject convertMenuToJSON(Menu menu) {
+
+		JSONObject json = new JSONObject();
+
+		if (menu == null) {
+			json.put("status", "false");
+			return json;
+		}
+
+		JSONArray jsonArray = new JSONArray();
+
+		for (Category cat : menu.getCategories()) {
+			String items = "";
+
+			for (Item item : cat.getItems()) {
+				items += item.getItemID() + ",," + item.getItemName() + ",,"
+						+ item.getDescription() + ",," + item.getPrice() + ",,"
+						+ item.getLikes() + ",," + item.getDislikes() + ",,"
+						+ item.getItemPic() + "##";
+			}
+
+			jsonArray.add(cat.getCategoryName() + "@@" + items);
+		}
+
+		json.put("status", "true");
+		json.put("menu", jsonArray);
+
+		return json;
+	}
+
+	public JSONObject convertBranchesToJSON(ArrayList<Branch> branches) {
+
+		JSONObject json = new JSONObject();
+
+		if (branches == null) {
+			json.put("status", "false");
+			return json;
+		}
+
+		JSONArray jsonArray = new JSONArray();
+
+		for (Branch branch : branches) {
+			JSONObject jsObj = new JSONObject();
+
+			jsObj.put("branchID", branch.getBranchId());
+			jsObj.put("address", branch.getAddress());
+			jsObj.put("location", branch.getLocation());
+
+			jsonArray.add(jsObj);
+		}
+
+		json.put("status", "true");
+		json.put("branches", jsonArray);
+
+		return json;
+	}
+
+	public JSONObject getRestaurantTaxJSON(int restID) {
+
+		JSONObject json = new JSONObject();
+		;
+		for (Restaurant rest : restaurants) {
+			if (rest.getRestaurantID() == restID) {
+				json.put("tax", rest.getTax());
+				json.put("services", rest.getServices());
+				json.put("status", "true");
+				return json;
+			}
+		}
+
+		json.put("status", "false");
+		return json;
+	}
+
+	public ArrayList<Branch> getBranches(int restID) {
+
+		for (Restaurant restaurant : restaurants) {
+			if (restaurant.getRestaurantID() == restID) {
+				return restaurant.getBranches();
+			}
+		}
+		return null;
 	}
 
 	public Menu getRestaurantMenu(int restID) {
@@ -72,37 +175,7 @@ public class RestaurantController {
 		return retMenu;
 	}
 
-	public String convertMenuToJSON(Menu menu) {
-
-		JSONArray jsonArray = new JSONArray();
-		JSONObject jsonStatus = new JSONObject();
-
-		if (menu == null) {
-			jsonStatus.put("status", "false");
-			jsonArray.add(jsonStatus);
-			return jsonArray.toJSONString();
-		}
-
-		jsonStatus.put("status", "true");
-
-		for (Category cat : menu.getCategories()) {
-			String items = "";
-
-			for (Item item : cat.getItems()) {
-				items += item.getItemID() + ",," + item.getItemName() + ",,"
-						+ item.getDescription() + ",," + item.getPrice() + ",,"
-						+ item.getLikes() + ",," + item.getDislikes() + ",,"
-						+ item.getItemPic() + "##";
-			}
-
-			jsonArray.add(cat.getCategoryName() + "@@" + items);
-		}
-
-		JSONObject json = new JSONObject();
-		json.put("menu", jsonArray);
-		return json.toJSONString();
-	}
-
+	
 	public ArrayList<Restaurant> searchRestaurantByName(String restaurantName) {
 
 		ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
@@ -129,33 +202,11 @@ public class RestaurantController {
 			}
 		}
 
-		/*
-		 * ArrayList<Menu> menuList = new ArrayList<Menu>(); MenuBuilder menu =
-		 * new MenuBuilder();
-		 * 
-		 * for (Category cat : rest.getMenu().getCategories()) { if
-		 * (cat.getCategoryName().contains(category))
-		 * menuList.add(menu.buildMenu(rest.getRestaurantID())); } return
-		 * menuList;
-		 */
-
 		return restaurantList;
 	}
 
-	public JSONObject convertRestaurantToJSON(Restaurant restaurant) {
-		JSONObject jsObj = new JSONObject();
 
-		jsObj.put("RestID", restaurant.getRestaurantID());
-		jsObj.put("RestName", restaurant.getRestName());
-		jsObj.put("RestLogo", restaurant.getLogo());
-		jsObj.put("RestRating", restaurant.getRating());
-		jsObj.put("RestHotline", restaurant.getHotLine());
-		jsObj.put("RestType", String.join(",", restaurant.getType().toString()));
-		jsObj.put("RestWHours", restaurant.getWorkingHours());
-
-		return jsObj;
-	}
-
+	
 	public int[] likeItem(int restID, int itemID, int userID)
 			throws SQLException {
 
@@ -251,6 +302,7 @@ public class RestaurantController {
 		OrderBean orderBean = new OrderBean();
 		return orderBean.addFavOrder(customerId, orderId);
 	}
+
 
 	/**************************************************************************/
 

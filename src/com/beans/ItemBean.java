@@ -160,11 +160,12 @@ public class ItemBean {
 			disLikes = rs.getInt("disLikes");
 		}
 
-		sql = "Select * from ItemCustomer where `itemId` = ?";
+		sql = "Select * from ItemCustomer where `itemId` = ? AND `customerId`=?";
 
 		stmt = conn.prepareStatement(sql);
 
 		stmt.setInt(1, itemId);
+		stmt.setInt(2, userId);
 		ResultSet rs2 = stmt.executeQuery();
 
 		if (rs2.next()) {

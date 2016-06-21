@@ -8,26 +8,36 @@ public class Restaurant {
 	private String restName;
 	private String logo;
 	private double rating;
-	private int nUsers; 
+	private int nUsers;
 	private String[] type;
 	private Menu menu;
-	private ArrayList<Branch> restaurantBranches = new ArrayList<Branch>();
 	private int hotLine;
 	private String deliverTo;
 	private String workingHours;
 	private String timeForDeliver;
+	private double tax;
+	private double services;
+	private ArrayList<Offer> offers;
+	private ArrayList<Branch> branches = new ArrayList<Branch>();
 	private ArrayList<Review> reviews = new ArrayList<Review>();
 
 	public Restaurant() {
 
+		restaurantID = nUsers = hotLine = 0;
+		restName = logo = deliverTo = workingHours = timeForDeliver = "";
+		rating = tax = services = 0.0;
+		type = null;
+		menu = new Menu(0);
+		branches = new ArrayList<Branch>();
+		reviews = new ArrayList<Review>();
+		offers = new ArrayList<Offer>();
 	}
 
 	public Restaurant(int restaurantID, String restName, String logo,
-			double averageRating, int nUsers, String[] type,
-			Menu menu, ArrayList<Branch> restaurantBranches, int hotLine,
+			double averageRating, int nUsers, String[] type, Menu menu,
+			ArrayList<Branch> restaurantBranches, int hotLine,
 			String deliverTo, String workingHours, String timeForDeliver,
 			ArrayList<Review> reviews) {
-		super();
 		this.restaurantID = restaurantID;
 		this.restName = restName;
 		this.logo = logo;
@@ -35,11 +45,37 @@ public class Restaurant {
 		this.nUsers = nUsers;
 		this.type = type;
 		this.menu = menu;
-		this.restaurantBranches = restaurantBranches;
+		this.branches = restaurantBranches;
 		this.hotLine = hotLine;
 		this.deliverTo = deliverTo;
 		this.workingHours = workingHours;
 		this.timeForDeliver = timeForDeliver;
+		this.reviews = reviews;
+		offers = new ArrayList<Offer>();
+		tax = services = 0.0;
+	}
+
+	public Restaurant(int restaurantID, String restName, String logo,
+			double rating, int nUsers, String[] type, Menu menu, int hotLine,
+			String deliverTo, String workingHours, String timeForDeliver,
+			double tax, double services, ArrayList<Offer> offers,
+			ArrayList<Branch> restaurantBranches, ArrayList<Review> reviews) {
+		super();
+		this.restaurantID = restaurantID;
+		this.restName = restName;
+		this.logo = logo;
+		this.rating = rating;
+		this.nUsers = nUsers;
+		this.type = type;
+		this.menu = menu;
+		this.hotLine = hotLine;
+		this.deliverTo = deliverTo;
+		this.workingHours = workingHours;
+		this.timeForDeliver = timeForDeliver;
+		this.tax = tax;
+		this.services = services;
+		this.offers = offers;
+		this.branches = restaurantBranches;
 		this.reviews = reviews;
 	}
 
@@ -83,7 +119,7 @@ public class Restaurant {
 		this.nUsers = nUsers;
 	}
 
-	public 	String[] getType() {
+	public String[] getType() {
 		return type;
 	}
 
@@ -99,12 +135,12 @@ public class Restaurant {
 		this.menu = menu;
 	}
 
-	public ArrayList<Branch> getRestaurantBranches() {
-		return restaurantBranches;
+	public ArrayList<Branch> getBranches() {
+		return branches;
 	}
 
-	public void setRestaurantBranches(ArrayList<Branch> restaurantBranches) {
-		this.restaurantBranches = restaurantBranches;
+	public void setBranches(ArrayList<Branch> branches) {
+		this.branches = branches;
 	}
 
 	public int getHotLine() {
@@ -147,4 +183,27 @@ public class Restaurant {
 		this.reviews = reviews;
 	}
 
+	public double getServices() {
+		return services;
+	}
+
+	public double getTax() {
+		return tax;
+	}
+
+	public void setServices(double services) {
+		this.services = services;
+	}
+
+	public void setTax(double tax) {
+		this.tax = tax;
+	}
+
+	public ArrayList<Offer> getOffers() {
+		return offers;
+	}
+
+	public void setOffers(ArrayList<Offer> offers) {
+		this.offers = offers;
+	}
 }
